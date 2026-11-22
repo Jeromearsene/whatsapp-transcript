@@ -14,7 +14,7 @@ on:
 
 jobs:
   check:
-    runs-on: macos-14 # Apple Silicon (M1) runner
+    runs-on: macos-15 # Apple Silicon (arm64) runner — macos-14 was retired by GitHub on 2026-11-02
     steps:
       - uses: actions/checkout@v4
 
