@@ -1,0 +1,41 @@
+name: CI
+
+# mlx (and therefore mlx-whisper) only works on Apple Silicon: this workflow
+# runs on a macOS runner. It validates that the project installs and that the
+# scripts are syntactically correct, not the result of an actual
+# transcription (that would take too long to download/run in CI, and doesn't
+# belong in a repo with no versioned test audio or conversation content
+# anyway — on purpose, given the privacy of the voice notes).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: macos-14 # Apple Silicon (M1) runner
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Validate pyproject.toml
+        run: poetry check
+
+      - name: Check script syntax
+        run: poetry run python -m py_compile extract.py transcribe.py compile.py
+
+      - name: Lint (ruff)
+        run: poetry run ruff check .
+
+      - name: Run tests (pytest)
+        run: poetry run pytest -v

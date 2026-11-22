@@ -1,0 +1,32 @@
+# --- Private / personal content: NEVER commit ---
+# The working folder (decompressed WhatsApp export, media, transcripts) and
+# the generated book contain the real content of your conversation. If this
+# repo ever goes public, these must not end up in it.
+data/
+book.*
+*.md.bak
+WhatsApp Chat*.zip
+WhatsApp Chat*/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# --- Virtual environments ---
+.venv/
+venv/
+
+# --- Poetry ---
+# poetry.lock is intentionally TRACKED (not ignored): for an application
+# (package-mode = false), committing it guarantees everyone installs the
+# exact same dependency versions.
+
+# --- Editors / OS ---
+.DS_Store
+.idea/
+.vscode/
+*.swp
