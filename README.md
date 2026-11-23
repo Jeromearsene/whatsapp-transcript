@@ -29,6 +29,8 @@ extract.py     step 1: turns the WhatsApp export into structured messages.json
 transcribe.py  step 2: transcribes voice notes (.opus) with mlx-whisper
 compile.py     step 3: assembles everything into a book, grouped by day
                (Markdown, JSON or plain text — your choice)
+run.py         optional: interactive wizard that walks you through all 3
+               steps above, so you don't have to remember any flag
 ```
 
 ## Installation (one-time)
@@ -50,6 +52,26 @@ front (it runs the command inside the project's virtual environment), e.g.
 `poetry run python3 extract.py ...`. You can also run `poetry shell` once to
 activate the environment, then run `python3 ...` commands as-is for the rest
 of the terminal session.
+
+## Quick start: the interactive wizard
+
+If you'd rather be asked a few questions than remember command-line flags,
+run:
+
+```bash
+poetry run python3 run.py
+```
+
+It asks for the export path (suggesting the most recent `WhatsApp Chat*.zip`
+found in `~/Downloads`), whether to filter by date, which transcription
+model to use, and which output format you want — then runs `extract.py`,
+`transcribe.py` and `compile.py` for you with the matching flags. Pass
+`--yes` to accept every suggested default without being asked (handy once
+you've settled on your usual choices, for a quick repeat import).
+
+The sections below describe the same 3 steps run individually, which is
+still the way to go if you want finer control (date filtering details,
+skipping a step, scripting it, etc.).
 
 ## Step 0 — get the WhatsApp export
 
@@ -157,7 +179,7 @@ When the conversation continues, repeat the 3 steps:
 ## Tests and linting
 
 ```bash
-poetry run pytest        # 27 tests (pure functions + end-to-end on each script)
+poetry run pytest        # 54 tests (pure functions + end-to-end on each script)
 poetry run ruff check .  # lint (style, imports, common bugs)
 ```
 

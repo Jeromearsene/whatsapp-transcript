@@ -29,6 +29,8 @@ extract.py     étape 1 : transforme l'export WhatsApp en messages.json structur
 transcribe.py  étape 2 : transcrit les vocaux (.opus) avec mlx-whisper
 compile.py     étape 3 : assemble tout en un livre, groupé par jour
                (Markdown, JSON ou texte brut — au choix)
+run.py         optionnel : assistant interactif qui te guide à travers les 3
+               étapes ci-dessus, sans avoir à retenir le moindre flag
 ```
 
 ## Installation (une seule fois)
@@ -50,6 +52,27 @@ Les commandes des étapes suivantes sont à lancer avec `poetry run` devant
 `poetry run python3 extract.py ...`. Tu peux aussi faire `poetry shell` une
 fois pour activer l'environnement, puis lancer les commandes `python3 ...`
 telles quelles pour le reste de la session de terminal.
+
+## Démarrage rapide : l'assistant interactif
+
+Si tu préfères répondre à quelques questions plutôt que retenir les flags en
+ligne de commande :
+
+```bash
+poetry run python3 run.py
+```
+
+Il demande le chemin de l'export (en suggérant le `WhatsApp Chat*.zip` le
+plus récent trouvé dans `~/Downloads`), s'il faut filtrer par date, quel
+modèle de transcription utiliser, et quel format de sortie tu veux — puis
+lance `extract.py`, `transcribe.py` et `compile.py` à ta place avec les bons
+flags. Passe `--yes` pour accepter toutes les valeurs par défaut suggérées
+sans qu'on te les demande (pratique une fois tes choix habituels fixés, pour
+un import rapide).
+
+Les sections ci-dessous décrivent les mêmes 3 étapes lancées individuellement,
+ce qui reste la solution si tu veux un contrôle plus fin (détails du filtre
+de dates, sauter une étape, scripter le tout, etc.).
 
 ## Étape 0 — obtenir l'export WhatsApp
 
@@ -157,7 +180,7 @@ Quand la discussion continue, répète les 3 étapes :
 ## Tests et lint
 
 ```bash
-poetry run pytest        # 27 tests (fonctions pures + bout-en-bout sur chaque script)
+poetry run pytest        # 54 tests (fonctions pures + bout-en-bout sur chaque script)
 poetry run ruff check .  # lint (style, imports, bugs fréquents)
 ```
 
