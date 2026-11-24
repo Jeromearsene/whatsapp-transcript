@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 
 import extract
@@ -132,3 +133,32 @@ def test_extract_date_filter(tmp_path):
     messages = json.loads((out_dir / "messages.json").read_text(encoding="utf-8"))
     assert len(messages) == 1
     assert messages[0]["type"] == "video"
+
+
+def test_extract_from_zip_archive_finds_media(tmp_path):
+    """Regression test: the default, documented workflow is to pass a .zip
+    export, not an already-extracted folder. In that case extract.py unzips
+    into out_dir/"_raw", which is nested *inside* --out by design — a
+    previous bug excluded everything under --out as a (presumed) already-
+    copied destination file, which silently discarded every real source file
+    in this exact default case, turning every photo/voice note/video into a
+    plain text message referencing the attachment that was never copied.
+    """
+    import json
+
+    build_dir = tmp_path / "to_zip"
+    build_dir.mkdir()
+    export_dir = _make_fake_export(build_dir)
+    zip_path = tmp_path / "WhatsApp Chat with Jane.zip"
+    with zipfile.ZipFile(zip_path, "w") as zf:
+        for f in export_dir.iterdir():
+            zf.write(f, arcname=f.name)
+
+    out_dir = tmp_path / "data"  # unrelated to zip_path: out_dir/"_raw" will be created fresh
+    _run_extract(zip_path, out_dir)
+
+    messages = json.loads((out_dir / "messages.json").read_text(encoding="utf-8"))
+    types = [m["type"] for m in messages]
+    assert types == ["image", "text", "audio", "video"]
+    assert all(m["media_file"] is not None for m in messages if m["type"] != "text")
+    assert (out_dir / "media" / "00002-AUDIO.opus").exists()

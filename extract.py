@@ -134,12 +134,17 @@ def main():
     raw_dir = load_export(export_path, out_dir / "_raw")
     chat_txt = find_chat_txt(raw_dir)
 
-    # List all source media files first (before copying anything): if --out is
-    # a subfolder of --export, copying while scanning would make the scan pick
-    # up the files we just copied and count them twice.
+    # List all source media files first (before copying anything): if the
+    # already-extracted --export folder happens to contain --out (so raw_dir
+    # overlaps with media_dir), copying while scanning would make the scan
+    # pick up the files we just copied and count/copy them twice. We only
+    # need to exclude media_dir itself here — NOT out_dir as a whole, since
+    # in the normal .zip workflow raw_dir is out_dir/"_raw", i.e. nested
+    # *inside* out_dir on purpose, and excluding all of out_dir would wrongly
+    # discard every real source file in that (default, documented) case.
     source_files = [
         f for f in raw_dir.rglob("*")
-        if f.is_file() and f.suffix.lower() in EXT_TO_TYPE and out_dir not in f.parents
+        if f.is_file() and f.suffix.lower() in EXT_TO_TYPE and media_dir not in f.parents
     ]
     media_files = []
     for f in source_files:
